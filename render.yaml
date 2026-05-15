@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: zainu-host
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app
+    envVars:
+      - key: 525604391861-gu4m8u06cp5ocj7hu9eb07lfkf6tpcgb.ap-ps.googleapis.com
+        sync: false
+      - key: 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
+        sync: false
+      - key: SERVER_PORT
+        value: 10000

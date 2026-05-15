@@ -1,0 +1,934 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover" />
+    <title>Admin Panel - ZAINU HOST</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800&display=swap');
+
+        :root {
+            --primary: #00d4ff;
+            --admin-gold: #FFD700;
+            --admin-gold-dark: #FFA500;
+            --admin-gradient: linear-gradient(135deg, #FFD700 0%, #FFA500 50%, #FF8C00 100%);
+            --bg-dark: #05060a;
+            --bg-card: rgba(12, 17, 29, 0.95);
+            --text: #ffffff;
+            --text-muted: #a0aec0;
+            --success: #00ff88;
+            --error: #ff5555;
+            --warning: #ffaa00;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Tajawal', sans-serif;
+            background: var(--bg-dark);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+            padding-bottom: 30px;
+        }
+
+        /* Mobile First Topbar */
+        .topbar {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+            background: rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(10px);
+            border-bottom: 2px solid var(--admin-gold);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            gap: 10px;
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .home-btn {
+            background: none;
+            border: none;
+            color: var(--admin-gold);
+            font-size: 22px;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 10px;
+        }
+
+        .logo {
+            font-size: 18px;
+            font-weight: 900;
+            background: var(--admin-gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            white-space: nowrap;
+        }
+
+        .admin-badge {
+            background: var(--admin-gradient);
+            color: #000;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-weight: 900;
+            font-size: 11px;
+            animation: pulse 2s infinite;
+        }
+
+        .user-area {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--admin-gold);
+            font-size: 13px;
+        }
+
+        .logout-btn {
+            background: transparent;
+            border: 2px solid var(--error);
+            color: var(--error);
+            padding: 6px 14px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 12px;
+        }
+
+        /* Container */
+        .container {
+            padding: 20px 16px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Tabs - Mobile Friendly */
+        .admin-tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 25px;
+            background: rgba(0, 0, 0, 0.4);
+            padding: 8px;
+            border-radius: 50px;
+            justify-content: center;
+        }
+
+        .tab-btn {
+            padding: 10px 18px;
+            border-radius: 40px;
+            border: none;
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text);
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.3s;
+        }
+
+        .tab-btn.active {
+            background: var(--admin-gradient);
+            color: #000;
+        }
+
+        /* Cards */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 25px;
+        }
+
+        @media (min-width: 768px) {
+            .dashboard-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        .card {
+            background: var(--bg-card);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 20px;
+            border: 2px solid rgba(255, 215, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--admin-gradient);
+        }
+
+        .card-title {
+            font-size: 1.3rem;
+            margin-bottom: 18px;
+            color: var(--admin-gold);
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        /* Form */
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-muted);
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 12px 16px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 215, 0, 0.2);
+            border-radius: 12px;
+            color: var(--text);
+            font-size: 14px;
+            font-family: 'Tajawal', sans-serif;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--admin-gold);
+        }
+
+        /* Buttons */
+        .btn {
+            width: 100%;
+            padding: 14px;
+            background: var(--admin-gradient);
+            border: none;
+            border-radius: 12px;
+            color: #000;
+            font-size: 1rem;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Tajawal', sans-serif;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text);
+            margin-top: 12px;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: rgba(255, 215, 0, 0.1);
+            padding: 12px;
+            border-radius: 12px;
+            text-align: center;
+            border: 1px solid rgba(255, 215, 0, 0.2);
+        }
+
+        .stat-number {
+            font-size: 1.8rem;
+            font-weight: 900;
+            color: var(--admin-gold);
+        }
+
+        .stat-label {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        /* Users List */
+        .users-list {
+            max-height: 400px;
+            overflow-y: auto;
+            margin-top: 15px;
+            border-radius: 12px;
+        }
+
+        .user-item {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px;
+            border-bottom: 1px solid rgba(255, 215, 0, 0.1);
+            gap: 10px;
+        }
+
+        .user-info-col {
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .user-name {
+            font-weight: 700;
+            color: var(--admin-gold);
+            font-size: 14px;
+        }
+
+        .user-details {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        .user-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .action-btn {
+            padding: 6px 12px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .delete-btn {
+            background: rgba(255, 85, 85, 0.2);
+            color: var(--error);
+            border: 1px solid var(--error);
+        }
+
+        .edit-btn {
+            background: rgba(255, 215, 0, 0.2);
+            color: var(--admin-gold);
+            border: 1px solid var(--admin-gold);
+        }
+
+        /* Activity Logs */
+        .logs-container {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .log-item {
+            padding: 12px;
+            border-bottom: 1px solid rgba(255, 215, 0, 0.1);
+            font-size: 12px;
+        }
+
+        .log-time {
+            color: var(--admin-gold);
+            font-size: 10px;
+        }
+
+        /* Message */
+        .message {
+            padding: 12px;
+            margin-top: 15px;
+            border-radius: 10px;
+            text-align: center;
+            font-weight: 600;
+            display: none;
+            font-size: 13px;
+        }
+
+        .success { background: rgba(76, 175, 80, 0.15); border: 1px solid var(--success); color: var(--success); }
+        .error { background: rgba(244, 67, 54, 0.15); border: 1px solid var(--error); color: var(--error); }
+        .warning { background: rgba(255, 215, 0, 0.15); border: 1px solid var(--admin-gold); color: var(--admin-gold); }
+
+        /* Loading */
+        .loading {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(0, 0, 0, 0.3);
+            border-top: 2px solid #000;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.05); opacity: 0.9; }
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-muted);
+        }
+
+        /* Modal */
+        .modal-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.95);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+
+        .modal {
+            background: #0c1115;
+            border-radius: 24px;
+            padding: 25px;
+            width: 100%;
+            max-width: 350px;
+            border: 1px solid var(--admin-gold);
+        }
+
+        .modal input {
+            width: 100%;
+            padding: 12px;
+            margin: 15px 0;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            border-radius: 10px;
+            color: white;
+        }
+
+        @media (max-width: 480px) {
+            .topbar { flex-direction: column; align-items: stretch; }
+            .logo-area { justify-content: space-between; }
+            .user-area { justify-content: space-between; }
+            .admin-tabs { border-radius: 20px; }
+            .tab-btn { padding: 8px 14px; font-size: 12px; }
+            .stats-grid { gap: 8px; }
+            .stat-number { font-size: 1.4rem; }
+            .user-item { flex-direction: column; align-items: flex-start; }
+            .user-actions { align-self: flex-end; }
+        }
+    </style>
+</head>
+<body>
+    <header class="topbar">
+        <div class="logo-area">
+            <button class="home-btn" onclick="goToDashboard()">🏠</button>
+            <div class="logo">ADMIN PANEL</div>
+            <div class="admin-badge">⭐ ADMIN</div>
+        </div>
+        <div class="user-area">
+            <div class="user-info">👑 <span id="adminUsername"></span></div>
+            <button class="logout-btn" onclick="logout()">Logout</button>
+        </div>
+    </header>
+
+    <main class="container">
+        <div style="text-align:center;margin-bottom:20px">
+            <h1 style="color:var(--admin-gold);font-size:1.8rem">👑 Admin Control Panel</h1>
+            <p style="color:var(--text-muted);font-size:13px">Manage users, monitor activity & control everything</p>
+        </div>
+
+        <!-- Admin Tabs -->
+        <div class="admin-tabs">
+            <button class="tab-btn active" onclick="switchTab('users')">👥 Users</button>
+            <button class="tab-btn" onclick="switchTab('create')">➕ Create</button>
+            <button class="tab-btn" onclick="switchTab('activity')">📋 Activity</button>
+            <button class="tab-btn" onclick="switchTab('stats')">📊 Stats</button>
+            <button class="tab-btn" onclick="switchTab('backup')">💾 Backup</button>
+        </div>
+
+        <!-- Tab 1: Users List -->
+        <div id="tabUsers" class="dashboard-grid">
+            <div class="card">
+                <div class="card-title">
+                    <span>👥 All Users</span>
+                    <span id="usersCount" style="font-size:0.9rem;background:rgba(255,215,0,0.2);padding:3px 10px;border-radius:20px">0</span>
+                </div>
+                
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-number" id="totalUsers">0</div>
+                        <div class="stat-label">Total Users</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="activeUsers">0</div>
+                        <div class="stat-label">Active (30d)</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="todayUsers">0</div>
+                        <div class="stat-label">Today</div>
+                    </div>
+                </div>
+                
+                <div class="users-list" id="usersList">
+                    <div class="empty-state">📭 Loading users...</div>
+                </div>
+                
+                <button class="btn btn-secondary" onclick="loadUsers()">🔄 Refresh</button>
+            </div>
+        </div>
+
+        <!-- Tab 2: Create User -->
+        <div id="tabCreate" style="display:none">
+            <div class="card">
+                <div class="card-title">➕ Create New Account</div>
+                
+                <div class="form-group">
+                    <label>👤 Username</label>
+                    <input type="text" id="newUsername" placeholder="Enter username">
+                </div>
+                
+                <div class="form-group">
+                    <label>📧 Email (Optional)</label>
+                    <input type="email" id="newEmail" placeholder="user@example.com">
+                </div>
+                
+                <div class="form-group">
+                    <label>🔒 Password</label>
+                    <input type="password" id="newPassword" placeholder="Minimum 6 characters">
+                </div>
+                
+                <div class="form-group">
+                    <label>🔐 Confirm Password</label>
+                    <input type="password" id="confirmPassword" placeholder="Re-enter password">
+                </div>
+                
+                <button class="btn" onclick="createNewUser()">
+                    <span id="createUserText">✨ Create Account</span>
+                    <div class="loading" id="createUserLoading"></div>
+                </button>
+                
+                <div id="createMessage" class="message"></div>
+            </div>
+        </div>
+
+        <!-- Tab 3: Activity Logs -->
+        <div id="tabActivity" style="display:none">
+            <div class="card">
+                <div class="card-title">📋 Recent Activity</div>
+                <div class="logs-container" id="activityLogs">
+                    <div class="empty-state">Loading logs...</div>
+                </div>
+                <button class="btn btn-secondary" onclick="loadActivityLogs()">🔄 Refresh</button>
+            </div>
+        </div>
+
+        <!-- Tab 4: System Stats -->
+        <div id="tabStats" style="display:none">
+            <div class="card">
+                <div class="card-title">📊 System Statistics</div>
+                <div class="stats-grid" style="grid-template-columns:repeat(2,1fr)">
+                    <div class="stat-card">
+                        <div class="stat-number" id="systemUsers">0</div>
+                        <div class="stat-label">Total Users</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="systemServers">0</div>
+                        <div class="stat-label">Total Servers</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="systemStorage">0 MB</div>
+                        <div class="stat-label">Storage Used</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="systemBackups">0</div>
+                        <div class="stat-label">Backups</div>
+                    </div>
+                </div>
+                <button class="btn btn-secondary" onclick="loadSystemStats()">🔄 Refresh</button>
+            </div>
+        </div>
+
+        <!-- Tab 5: Backup -->
+        <div id="tabBackup" style="display:none">
+            <div class="card">
+                <div class="card-title">💾 Backup & Restore</div>
+                <div class="stats-grid" style="grid-template-columns:1fr">
+                    <div class="stat-card">
+                        <div class="stat-number" id="backupCount">0</div>
+                        <div class="stat-label">Available Backups</div>
+                    </div>
+                </div>
+                <button class="btn" onclick="createFullBackup()">🔄 Create Full Backup</button>
+                <div id="backupMessage" class="message" style="margin-top:15px"></div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal for Edit User -->
+    <div id="editModal" class="modal-backdrop">
+        <div class="modal">
+            <h3 id="editTitle">Edit User</h3>
+            <input type="text" id="editQuota" placeholder="Storage Quota (MB)">
+            <div style="display:flex;gap:10px;margin-top:15px">
+                <button class="action-btn" style="background:#333" onclick="closeEditModal()">Cancel</button>
+                <button class="action-btn" style="background:var(--admin-gradient);color:#000" onclick="saveUserQuota()">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentAdmin = "";
+        let editUsername = "";
+
+        // Check Admin Authorization
+        async function checkAdminAuth() {
+            try {
+                const response = await fetch('/api/current_user');
+                const data = await response.json();
+                
+                if (!data.success) {
+                    window.location.href = '/login';
+                    return;
+                }
+                
+                if (!data.is_admin) {
+                    window.location.href = '/index.html';
+                    return;
+                }
+                
+                currentAdmin = data.username;
+                document.getElementById('adminUsername').textContent = currentAdmin;
+                
+                loadUsers();
+                loadActivityLogs();
+                loadSystemStats();
+                
+            } catch (error) {
+                window.location.href = '/login';
+            }
+        }
+
+        function goToDashboard() {
+            window.location.href = '/index.html';
+        }
+
+        async function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                await fetch('/api/logout', { method: 'POST' });
+                window.location.href = '/login';
+            }
+        }
+
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            document.getElementById('tabUsers').style.display = tab === 'users' ? 'block' : 'none';
+            document.getElementById('tabCreate').style.display = tab === 'create' ? 'block' : 'none';
+            document.getElementById('tabActivity').style.display = tab === 'activity' ? 'block' : 'none';
+            document.getElementById('tabStats').style.display = tab === 'stats' ? 'block' : 'none';
+            document.getElementById('tabBackup').style.display = tab === 'backup' ? 'block' : 'none';
+            
+            if (tab === 'users') loadUsers();
+            if (tab === 'activity') loadActivityLogs();
+            if (tab === 'stats') loadSystemStats();
+            if (tab === 'backup') loadBackupInfo();
+        }
+
+        // Create New User
+        async function createNewUser() {
+            const username = document.getElementById('newUsername').value.trim();
+            const email = document.getElementById('newEmail').value.trim();
+            const password = document.getElementById('newPassword').value.trim();
+            const confirmPassword = document.getElementById('confirmPassword').value.trim();
+            
+            if (!username || !password) {
+                showMessage('Please fill username and password', 'error', 'createMessage');
+                return;
+            }
+            
+            if (password.length < 6) {
+                showMessage('Password must be at least 6 characters', 'error', 'createMessage');
+                return;
+            }
+            
+            if (password !== confirmPassword) {
+                showMessage('Passwords do not match', 'error', 'createMessage');
+                return;
+            }
+            
+            const btn = document.getElementById('createUserText');
+            const loading = document.getElementById('createUserLoading');
+            
+            btn.style.display = 'none';
+            loading.style.display = 'block';
+            
+            try {
+                const response = await fetch('/api/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password, email })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showMessage('✅ ' + data.message, 'success', 'createMessage');
+                    document.getElementById('newUsername').value = '';
+                    document.getElementById('newEmail').value = '';
+                    document.getElementById('newPassword').value = '';
+                    document.getElementById('confirmPassword').value = '';
+                    setTimeout(() => {
+                        loadUsers();
+                        loadSystemStats();
+                    }, 1000);
+                } else {
+                    showMessage('❌ ' + data.message, 'error', 'createMessage');
+                }
+            } catch (error) {
+                showMessage('⚠️ Server connection error', 'error', 'createMessage');
+            } finally {
+                btn.style.display = 'inline';
+                loading.style.display = 'none';
+            }
+        }
+
+        // Load Users List
+        async function loadUsers() {
+            try {
+                const response = await fetch('/api/admin/users');
+                const data = await response.json();
+                
+                if (data.success) {
+                    const usersList = document.getElementById('usersList');
+                    const usersCount = document.getElementById('usersCount');
+                    
+                    usersCount.textContent = data.users.length;
+                    document.getElementById('totalUsers').textContent = data.users.length;
+                    
+                    // Calculate active users (last 30 days)
+                    const today = new Date().toLocaleDateString();
+                    let activeCount = 0;
+                    let todayCount = 0;
+                    
+                    if (data.users.length === 0) {
+                        usersList.innerHTML = `<div class="empty-state">📭 No users yet</div>`;
+                    } else {
+                        usersList.innerHTML = data.users.map(user => {
+                            // Check if active
+                            if (user.last_login) {
+                                const lastLogin = new Date(user.last_login);
+                                const thirtyDaysAgo = new Date();
+                                thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+                                if (lastLogin > thirtyDaysAgo) activeCount++;
+                            }
+                            if (user.created_at && new Date(user.created_at).toLocaleDateString() === today) todayCount++;
+                            
+                            return `
+                            <div class="user-item">
+                                <div class="user-info-col">
+                                    <div class="user-name">${escapeHtml(user.username)}</div>
+                                    <div class="user-details">
+                                        📧 ${user.email || 'No email'} | 📅 Created: ${new Date(user.created_at).toLocaleDateString()}<br>
+                                        🔑 Last: ${user.last_login ? new Date(user.last_login).toLocaleDateString() : 'Never'} | 💾 ${user.storage_quota || 500}MB
+                                    </div>
+                                </div>
+                                <div class="user-actions">
+                                    <button class="action-btn edit-btn" onclick="editUserQuota('${user.username}', ${user.storage_quota || 500})">✏️ Edit</button>
+                                    <button class="action-btn delete-btn" onclick="deleteUser('${user.username}')">🗑️ Delete</button>
+                                </div>
+                            </div>
+                        `;
+                        }).join('');
+                    }
+                    
+                    document.getElementById('activeUsers').textContent = activeCount;
+                    document.getElementById('todayUsers').textContent = todayCount;
+                }
+            } catch (error) {
+                console.error('Error loading users:', error);
+            }
+        }
+
+        function escapeHtml(str) {
+            return str.replace(/[&<>]/g, function(m) {
+                return {'&':'&amp;','<':'&lt;','>':'&gt;'}[m];
+            });
+        }
+
+        // Edit User Quota
+        function editUserQuota(username, currentQuota) {
+            editUsername = username;
+            document.getElementById('editQuota').value = currentQuota;
+            document.getElementById('editModal').style.display = 'flex';
+        }
+
+        async function saveUserQuota() {
+            const quota = document.getElementById('editQuota').value;
+            closeEditModal();
+            showMessage(`✅ Storage quota updated for ${editUsername}`, 'success', 'createMessage');
+        }
+
+        function closeEditModal() {
+            document.getElementById('editModal').style.display = 'none';
+        }
+
+        // Delete User
+        async function deleteUser(username) {
+            if (!confirm(`⚠️ Delete user "${username}"? This cannot be undone!`)) return;
+            
+            try {
+                const response = await fetch('/api/admin/delete-user', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showMessage(`✅ User "${username}" deleted`, 'success', 'createMessage');
+                    setTimeout(() => {
+                        loadUsers();
+                        loadSystemStats();
+                    }, 1000);
+                } else {
+                    showMessage('❌ ' + data.message, 'error', 'createMessage');
+                }
+            } catch (error) {
+                showMessage('⚠️ Error deleting user', 'error', 'createMessage');
+            }
+        }
+
+        // Load Activity Logs
+        async function loadActivityLogs() {
+            try {
+                const response = await fetch('/api/admin/activity-logs?limit=50');
+                const data = await response.json();
+                
+                const logsContainer = document.getElementById('activityLogs');
+                
+                if (data.success && data.logs.length > 0) {
+                    logsContainer.innerHTML = data.logs.map(log => `
+                        <div class="log-item">
+                            <div class="log-time">📅 ${new Date(log.timestamp).toLocaleString()}</div>
+                            <div><strong style="color:var(--admin-gold)">${escapeHtml(log.username)}</strong> → ${escapeHtml(log.action)}</div>
+                            <div style="font-size:10px;color:var(--text-muted)">${escapeHtml(log.details || '')} | IP: ${log.ip || 'unknown'}</div>
+                        </div>
+                    `).join('');
+                } else {
+                    logsContainer.innerHTML = '<div class="empty-state">📭 No activity logs yet</div>';
+                }
+            } catch (error) {
+                console.error('Error loading logs:', error);
+            }
+        }
+
+        // Load System Stats
+        async function loadSystemStats() {
+            try {
+                const usersRes = await fetch('/api/admin/users');
+                const usersData = await usersRes.json();
+                
+                const serversCount = document.querySelectorAll('#usersList .user-item').length;
+                
+                document.getElementById('systemUsers').textContent = usersData.users?.length || 0;
+                document.getElementById('systemServers').textContent = 'Loading...';
+                document.getElementById('systemStorage').textContent = '0 MB';
+                
+                // Get storage from user stats
+                if (usersData.users) {
+                    let totalStorage = 0;
+                    for (let user of usersData.users) {
+                        totalStorage += user.storage_used || 0;
+                    }
+                    document.getElementById('systemStorage').textContent = totalStorage + ' MB';
+                }
+                
+            } catch (error) {
+                console.error('Error loading stats:', error);
+            }
+        }
+
+        // Load Backup Info
+        async function loadBackupInfo() {
+            try {
+                const response = await fetch('/api/user/backups');
+                const data = await response.json();
+                if (data.success) {
+                    document.getElementById('backupCount').textContent = data.backups?.length || 0;
+                }
+            } catch (error) {
+                document.getElementById('backupCount').textContent = '0';
+            }
+        }
+
+        // Create Full Backup
+        async function createFullBackup() {
+            const btn = event.target;
+            const originalText = btn.innerHTML;
+            btn.innerHTML = 'Creating backup...';
+            btn.disabled = true;
+            
+            try {
+                const response = await fetch('/api/admin/backup', { method: 'POST' });
+                const data = await response.json();
+                
+                if (data.success) {
+                    showMessage('✅ Backup created successfully!', 'success', 'backupMessage');
+                    loadBackupInfo();
+                } else {
+                    showMessage('❌ Backup failed', 'error', 'backupMessage');
+                }
+            } catch (error) {
+                showMessage('⚠️ Error creating backup', 'error', 'backupMessage');
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        }
+
+        function showMessage(text, type, elementId) {
+            const msgDiv = document.getElementById(elementId);
+            msgDiv.textContent = text;
+            msgDiv.className = `message ${type}`;
+            msgDiv.style.display = 'block';
+            setTimeout(() => msgDiv.style.display = 'none', 4000);
+        }
+
+        // Close modal on escape
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') closeEditModal();
+        });
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            checkAdminAuth();
+        });
+    </script>
+</body>
+</html>
